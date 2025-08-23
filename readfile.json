@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "A tool that allows the user to read the contents of a file from a URL link and convert it into markdown format.",
+    "title": "File Reader API",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://your-domain.com"
+    }
+  ],
+  "paths": {
+    "/api/proxy/read_file": {
+      "post": {
+        "description": "Allows for reading the contents of an URL link, including PDF/DOC/DOCX/PPT/CSV/XLS/XLSX/HTML content, Google Drive, Dropbox, OneDrive, and other file types.",
+        "operationId": "FileReaderAPI",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadFileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            },
+            "description": "File Not Found"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Read the contents of an URL link",
+        "x-openai-isConsequential": false
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReadFileRequest": {
+        "properties": {
+          "http_url": {
+            "description": "User will pass a HTTPS or HTTP url to a file so that the file contents can be read.",
+            "title": "Http URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "http_url"
+        ],
+        "title": "ReadFileRequest",
+        "type": "object"
+      },
+      "BaseResponse": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "integer"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "data": {
+            "title": "Data",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "msg"
+        ],
+        "title": "Base Response",
+        "type": "object"
+      }
+    }
+  }
+}
