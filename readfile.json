@@ -7,13 +7,13 @@
   },
   "servers": [
     {
-      "url": "https://your-domain.com"
+      "url": "http://nextchat-readfile:8000"
     }
   ],
   "paths": {
-    "/api/proxy/read_file": {
+    "/read_file": {
       "post": {
-        "description": "Allows for reading the contents of an URL link, including PDF/DOC/DOCX/PPT/CSV/XLS/XLSX/HTML content, Google Drive, Dropbox, OneDrive, and other file types.",
+        "description": "Read the contents from an URL link, including DOCX/PPTX/XLS/XLSX/PDF and other file types.",
         "operationId": "FileReaderAPI",
         "requestBody": {
           "content": {
@@ -67,7 +67,7 @@
             "description": "Internal Server Error"
           }
         },
-        "summary": "Read the contents of an URL link",
+        "summary": "Read the contents from a URL link",
         "x-openai-isConsequential": false
       }
     }
@@ -77,8 +77,8 @@
       "ReadFileRequest": {
         "properties": {
           "http_url": {
-            "description": "User will pass a HTTPS or HTTP url to a file so that the file contents can be read.",
-            "title": "Http URL",
+            "description": "User will pass an HTTPS or HTTP URL to a file so that the file contents can be read.",
+            "title": "HTTP URL",
             "type": "string"
           }
         },

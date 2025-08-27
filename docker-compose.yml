@@ -1,0 +1,30 @@
+networks:
+  nextchat-network:
+
+services:
+  nextchat:
+    image: yidadaa/chatgpt-next-web:latest
+    container_name: nextchat
+    ports:
+      - 127.0.0.1:3001:3000
+    networks:
+      - nextchat-network
+    environment:
+      AZURE_API_KEY: <azure-api-key>
+      AZURE_URL: <azure-endpoint>
+      AZURE_API_VERSION: 2024-12-01-preview
+      CODE: <code>
+      CUSTOM_MODELS: -all,+gpt-5@Azure,+gpt-5-mini@Azure,+gpt-5-nano@Azure,+gpt-5-chat@Azure,+gpt-4.1@Azure,+gpt-4.1-mini@Azure,+gpt-4.1-nano@Azure,+gpt-4o@Azure,+gpt-4o-mini@Azure,+o4-mini@Azure,+o3@Azure,+o3-mini@Azure,+o1@Azure,+o1-mini@Azure
+      DEFAULT_MODEL: gpt-5-mini@Azure
+      HIDE_USER_API_KEY: 1
+      HIDE_BALANCE_QUERY: 1
+    restart: always
+
+  nextchat-readfile:
+    image: na2cucl4/nextchat-readfile:latest
+    container_name: nextchat-readfile
+    expose:
+      - 8000
+    networks:
+      - nextchat-network
+    restart: always

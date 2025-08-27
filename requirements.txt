@@ -1,6 +1,4 @@
 aiohttp==3.12.15
 fastapi==0.110.1
-fastapi_limiter==0.1.6
-markitdown[all]==0.1.2
-redis==5.1.0b4
+markitdown[pptx,docx,xlsx,xls,pdf]==0.1.2
 uvicorn[standard]==0.27.1

@@ -1,50 +1,21 @@
 import os
 import time
-from contextlib import asynccontextmanager
 
 import aiohttp
-import redis.asyncio as redis
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi_limiter import FastAPILimiter
 from markitdown import MarkItDown
 
-from config import TEMP_DIR, MAX_REQUESTS, ORIGINS
 from log import log
 from model import BaseResponse, FilePayload
 
+TEMP_DIR = "temp"
+os.makedirs(TEMP_DIR, exist_ok=True)
 
-# FastAPI Limiter initialization
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    redis_connection = redis.from_url("redis://localhost", encoding="utf-8", decode_responses=True)
-    await FastAPILimiter.init(redis_connection)
-    yield
-    await FastAPILimiter.close()
+app = FastAPI()  # FastAPI 实例
+md = MarkItDown()  # MarkItDown 转换器
 
 
-# FastAPI 实例
-if os.getenv("DEV"):
-    print("Running in development mode")
-    app = FastAPI(lifespan=lifespan)
-else:
-    print("Running in production mode")
-    app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# 初始化 MarkItDown 转换器
-md = MarkItDown()
-
-
-@app.post("/read_file", dependencies=MAX_REQUESTS)
+@app.post("/read_file")
 async def read_file(request: Request, payload: FilePayload):
     # 检查 http_url 是否存在
     if not payload.http_url:
