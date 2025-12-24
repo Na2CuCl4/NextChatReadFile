@@ -14,8 +14,9 @@ services:
       AZURE_URL: <azure-endpoint>
       AZURE_API_VERSION: 2024-12-01-preview
       CODE: <code>
-      CUSTOM_MODELS: -all,+gpt-5@Azure,+gpt-5-mini@Azure,+gpt-5-nano@Azure,+gpt-5-chat@Azure,+gpt-4.1@Azure,+gpt-4.1-mini@Azure,+gpt-4.1-nano@Azure,+gpt-4o@Azure,+gpt-4o-mini@Azure,+o4-mini@Azure,+o3@Azure,+o3-mini@Azure,+o1@Azure,+o1-mini@Azure
-      DEFAULT_MODEL: gpt-5-mini@Azure
+      CUSTOM_MODELS: -all,+gpt-5.2@Azure,+gpt-5.2-chat@Azure,+gpt-5.1@Azure,+gpt-5.1-chat@Azure,+gpt-5@Azure,+gpt-5-mini@Azure,+gpt-5-nano@Azure,+gpt-5-chat@Azure,+gpt-4.1@Azure,+gpt-4.1-mini@Azure,+gpt-4.1-nano@Azure,+gpt-4o@Azure,+gpt-4o-mini@Azure,+o4-mini@Azure,+o3@Azure,+o3-mini@Azure,+o1@Azure,+o1-mini@Azure
+      DEFAULT_MODEL: gpt-5.2-chat@Azure
+      FILE_READING_SERVER: http://nextchat-readfile:8000/read_file
       HIDE_USER_API_KEY: 1
       HIDE_BALANCE_QUERY: 1
     restart: always

@@ -16,6 +16,10 @@ This plugin supports reading files in DOCX, PPTX, XLS, XLSX, and PDF formats fro
 
 The request address here is a Docker container name, which is equivalent to an internal network address; we’ll explain this in detail later.
 
+### v1.1.0 Update
+
+To make the plugin easier to use, I forked the original NextChat project and continue to develop and maintain it at [NextChat](https://github.com/Na2CuCl4/NextChat). The new project provides better support for file reading: it can read files directly (`/read_file`) without first downloading them from a URL (`/read_url`), so you no longer need to add a plugin. You only need to add one environment variable in Docker Compose to enable this feature—see the [`docker-compose.yml`](docker-compose.yml) in this directory for details.
+
 ### Prerequisites
 
 You need a server with Ubuntu preinstalled (22.04 or above is recommended), with Docker and Docker Compose installed. I use Docker Compose on the server to deploy all services, which makes it easy to manage multiple services and to scale and maintain them. After writing the configuration file, you only need to run the following command to (re)start all services:
@@ -25,8 +29,6 @@ sudo docker compose up -d
 ```
 
 I don’t recommend using `apt`’s `docker.io` and `docker-compose`; instead, follow Docker’s official installation guide (using [Ubuntu](https://docs.docker.com/engine/install/ubuntu/) as an example).
-
-When using Docker in mainland China, you may need to configure a domestic mirror accelerator to improve download speeds. You can refer to Alibaba Cloud’s [Docker image accelerator](https://help.aliyun.com/zh/acr/user-guide/accelerate-the-pulls-of-docker-official-images) for configuration.
 
 ## Build your own plugin server
 
@@ -73,6 +75,8 @@ services:
       - 8000
     restart: always
 ```
+
+**Note**: The `expose` directive only exposes the port to other containers within the same Docker network, and does not map it to the host's port. This is sufficient for this project because the NextChat container will access the plugin server through the internal network address. If you need to expose the plugin server to external access, you can use the `ports` directive for port mapping, for example `- "8000:8000"`.
 
 ### Implement plugin communication
 

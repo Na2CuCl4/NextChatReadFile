@@ -16,6 +16,10 @@ NextChat 是支持插件的，详情可参考 [NextChat-Awesome-Plugins](https:/
 
 这里的请求地址是一个 Docker 容器名称，相当于内网地址，我们后面会详细介绍。
 
+### v1.1.0 更新
+
+为了更方便地使用插件，我 Fork 了原 NextChat 项目，并在此基础上继续开发和维护，新的仓库地址为 [NextChat](https://github.com/Na2CuCl4/NextChat)。新项目更好地支持了文件读取功能，可以直接读取文件（`/read_file`）而不必从 URL 中下载文件后再读取（`/read_url`），故不必再添加插件。现在只需要在 Docker Compose 中添加一个环境变量，即可启用该功能，详情请参考目录中的 [`docker-compose.yml`](docker-compose.yml)。
+
 ### 前期配置
 
 你需要有一台预装了 Ubuntu（建议 22.04 及以上版本）的服务器，服务器上需要安装 Docker 和 Docker Compose。我在服务器上使用 Docker Compose 部署所有服务，其优点是可以方便地管理多个服务，并且能够轻松地进行扩展和维护。写好配置文件后，你只需要运行以下命令即可（重新）启动所有服务：
@@ -26,7 +30,7 @@ sudo docker compose up -d
 
 我不建议你使用 `apt` 的 `docker.io` 和 `docker-compose`，而参考 Docker 官方的安装说明（以 [Ubuntu](https://docs.docker.com/engine/install/ubuntu/) 为例）。
 
-在国内环境使用 Docker 时，你可能需要配置国内镜像加速器，以提高下载速度。可以参考阿里云的 [Docker 镜像加速器](https://help.aliyun.com/zh/acr/user-guide/accelerate-the-pulls-of-docker-official-images) 进行配置。
+在国内环境使用 Docker 时，你可能需要配置国内镜像加速器，以提高下载速度。可以参考 [DockerHub 国内加速镜像列表](https://github.com/dongyubin/DockerHub) 进行配置。
 
 ## 搭建自己的插件服务器
 
@@ -74,6 +78,8 @@ services:
     restart: always
 ```
 
+**注意**：`expose` 指令只会将端口暴露给同一 Docker 网络中的其他容器，而不会映射到主机的端口上。这对于本项目来说已经足够使用，因为 NextChat 容器会通过内网地址访问该插件服务器。如果你需要将插件服务器暴露给外界访问，可以使用 `ports` 指令进行端口映射，例如 `- "8000:8000"`。
+
 ### 实现插件通信
 
 NextChat 的 Docker Compose 配置文件的内容如下：
@@ -109,7 +115,7 @@ curl -X POST https://chat.mydomain.com/api/proxy/read_url -H 'Content-Type: appl
 curl -X POST http://base.url/read_url -H 'Content-Type: application/json' -d '{"data":"..."}'
 ```
 
-为了让 NextChat 能够访问我们刚才搭建的插件服务器，我们需要让它们处于同一个 Docker 网络中。为此，我们可以在 Docker Compose 文件中定义一个自定义网络，例如 `nextchat-network`，并将两个服务都连接到这个网络上。最终的 Docker Compose 文件参见目录中的 `docker-compose.yml`。
+为了让 NextChat 能够访问我们刚才搭建的插件服务器，我们需要让它们处于同一个 Docker 网络中。为此，我们可以在 Docker Compose 文件中定义一个自定义网络，例如 `nextchat-network`，并将两个服务都连接到这个网络上。最终的 Docker Compose 文件参见目录中的 [`docker-compose.yml`](docker-compose.yml)。
 
 最后，我们前面提到 `readfile.json` 中的 `url` 字段就是 `http://nextchat-readfile:8000`，这正是我们在 Docker Compose 中为插件服务器指定的服务名称和端口。
 
