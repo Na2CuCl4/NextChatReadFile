@@ -12,7 +12,7 @@ NextChat 是支持插件的，详情可参考 [NextChat-Awesome-Plugins](https:/
 
 不幸的是，NextChat 原本用于读取 PDF 的 [ChatPDF](https://github.com/ChatGPTNextWeb/NextChat-Awesome-Plugins/tree/main/plugins/chatpdf) 插件失效了，似乎是插件提供商 [AI Document Maker](https://gpt.chatpdf.aidocmaker.com/) 停止了支持。然而，这个插件却又十分常用且实用，所以我自己动手实现了一个，于是有了本项目。
 
-本插件支持读取链接中的 DOCX、PPTX、XLS、XLSX、PDF 等格式的文件，`readfile.json` 就是本插件的 OpenAPI 模板。你可以将其粘贴至 [Swagger Editor](https://editor.swagger.io/) 中了解其详细含义。当 LLM 检测到请求中包含读取文件的任务和文件 URL 链接时，其会向 `http://nextchat-readfile:8000/read_file` 发送 POST 请求，并将文件 URL 作为请求体中 `http_url` 的值。待服务器返回文件内容时，LLM 会将其纳入上下文中，从而实现对文件内容的访问和处理。
+本插件支持读取链接中的 DOCX、PPTX、XLS、XLSX、PDF 等格式的文件，`readfile.json` 就是本插件的 OpenAPI 模板。你可以将其粘贴至 [Swagger Editor](https://editor.swagger.io/) 中了解其详细含义。当 LLM 检测到请求中包含读取文件的任务和文件 URL 链接时，其会向 `http://nextchat-readfile:8000/read_url` 发送 POST 请求，并将文件 URL 作为请求体中 `url` 的值。待服务器返回文件内容时，LLM 会将其纳入上下文中，从而实现对文件内容的访问和处理。
 
 这里的请求地址是一个 Docker 容器名称，相当于内网地址，我们后面会详细介绍。
 
@@ -34,7 +34,7 @@ sudo docker compose up -d
 
 由于 NextChat 插件本质上是向插件服务商发送 OpenAPI 模板定义的请求，所以我们只需要在自己的服务器上实现一个的接口即可。这里我选择 Python + FastAPI 来实现这个插件服务器。
 
-实现思路非常简单。对于收到的 `http_url`，我们需要用 `aiohttp` 下载文件内容，并将其暂时存在 `temp` 文件夹中。然后，我们需要解析此文件的内容，并尝试将其转换为文字，这里我们使用微软公司开发的 [MarkItDown](https://github.com/microsoft/markitdown) 库来实现，它支持将应用中常见的 DOCX、PPTX、XLS、XLSX、PDF 等格式转换为 Markdown 格式的文本。最后，我们将转换后的文本作为响应返回给 LLM。
+实现思路非常简单。对于收到的 `url`，我们需要用 `aiohttp` 下载文件内容，并将其暂时存在 `temp` 文件夹中。然后，我们需要解析此文件的内容，并尝试将其转换为文字，这里我们使用微软公司开发的 [MarkItDown](https://github.com/microsoft/markitdown) 库来实现，它支持将应用中常见的 DOCX、PPTX、XLS、XLSX、PDF 等格式转换为 Markdown 格式的文本。最后，我们将转换后的文本作为响应返回给 LLM。
 
 以下是对各个文件和关键代码的说明：
 
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-这样你就能在 `http://localhost:8000` 访问你的插件服务器了。向 `http://localhost:8000/read_file` 发送请求，即可实现文件读取功能。
+这样你就能在 `http://localhost:8000` 访问你的插件服务器了。向 `http://localhost:8000/read_url` 发送请求，即可实现文件读取功能。
 
 如果你需要向外界提供服务，你需要将 `uvicorn` 的 `host` 参数设置为 `0.0.0.0`，使其可以监听所有 IP 地址：
 
@@ -103,10 +103,10 @@ services:
 
 ```bash
 # 在外界电脑上
-curl -X POST https://chat.mydomain.com/api/proxy/read_file -H 'Content-Type: application/json' -H 'X-Base-URL: http://base.url' -d '{"data":"..."}'
+curl -X POST https://chat.mydomain.com/api/proxy/read_url -H 'Content-Type: application/json' -H 'X-Base-URL: http://base.url' -d '{"data":"..."}'
 
 # 在部署了 NextChat 的服务器上
-curl -X POST http://base.url/read_file -H 'Content-Type: application/json' -d '{"data":"..."}'
+curl -X POST http://base.url/read_url -H 'Content-Type: application/json' -d '{"data":"..."}'
 ```
 
 为了让 NextChat 能够访问我们刚才搭建的插件服务器，我们需要让它们处于同一个 Docker 网络中。为此，我们可以在 Docker Compose 文件中定义一个自定义网络，例如 `nextchat-network`，并将两个服务都连接到这个网络上。最终的 Docker Compose 文件参见目录中的 `docker-compose.yml`。

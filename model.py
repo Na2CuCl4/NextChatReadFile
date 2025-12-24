@@ -17,4 +17,4 @@ class BaseResponse(JSONResponse):
 
 
 class FilePayload(BaseModel):
-    http_url: str = None
+    url: str = None

@@ -3,7 +3,7 @@
   "info": {
     "description": "A tool that allows the user to read the contents of a file from a URL link and convert it into markdown format.",
     "title": "File Reader API",
-    "version": "v1.0.0"
+    "version": "v1.1.0"
   },
   "servers": [
     {
@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/read_file": {
+    "/read_url": {
       "post": {
         "description": "Read the contents from an URL link, including DOCX/PPTX/XLS/XLSX/PDF and other file types.",
         "operationId": "FileReaderAPI",
@@ -76,14 +76,14 @@
     "schemas": {
       "ReadFileRequest": {
         "properties": {
-          "http_url": {
+          "url": {
             "description": "User will pass an HTTPS or HTTP URL to a file so that the file contents can be read.",
             "title": "HTTP URL",
             "type": "string"
           }
         },
         "required": [
-          "http_url"
+          "url"
         ],
         "title": "ReadFileRequest",
         "type": "object"

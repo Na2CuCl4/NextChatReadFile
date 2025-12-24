@@ -12,7 +12,7 @@ NextChat supports plugins; see the [NextChat-Awesome-Plugins](https://github.com
 
 Unfortunately, the [ChatPDF](https://github.com/ChatGPTNextWeb/NextChat-Awesome-Plugins/tree/main/plugins/chatpdf) plugin that NextChat originally used for reading PDFs has stopped working—apparently the provider, [AI Document Maker](https://gpt.chatpdf.aidocmaker.com/), ended support. However, this plugin is popular and useful, so I implemented a replacement myself, which led to this project.
 
-This plugin supports reading files in DOCX, PPTX, XLS, XLSX, and PDF formats from links. The `readfile.json` file is the plugin’s OpenAPI template. You can paste it into the [Swagger Editor](https://editor.swagger.io/) to understand its details. When the LLM detects that a request involves reading a file and contains a file URL, it sends a POST request to `http://nextchat-readfile:8000/read_file`, with the file URL set as the value of `http_url` in the request body. Once the server returns the file contents, the LLM includes them in its context, enabling access to and processing of the file content.
+This plugin supports reading files in DOCX, PPTX, XLS, XLSX, and PDF formats from links. The `readfile.json` file is the plugin’s OpenAPI template. You can paste it into the [Swagger Editor](https://editor.swagger.io/) to understand its details. When the LLM detects that a request involves reading a file and contains a file URL, it sends a POST request to `http://nextchat-readfile:8000/read_url`, with the file URL set as the value of `url` in the request body. Once the server returns the file contents, the LLM includes them in its context, enabling access to and processing of the file content.
 
 The request address here is a Docker container name, which is equivalent to an internal network address; we’ll explain this in detail later.
 
@@ -34,7 +34,7 @@ When using Docker in mainland China, you may need to configure a domestic mirror
 
 Since a NextChat plugin essentially sends requests defined by an OpenAPI template to a plugin service, all we need is to implement such an endpoint on our own server. I chose Python + FastAPI to build this plugin server.
 
-The approach is straightforward. For each `http_url` received, we use `aiohttp` to download the file and temporarily store it in a `temp` folder. Then we parse the file’s contents and try to convert them to text using Microsoft’s [MarkItDown](https://github.com/microsoft/markitdown) library, which supports converting common formats such as DOCX, PPTX, XLS, XLSX, and PDF into Markdown text. Finally, we return the converted text to the LLM as the response.
+The approach is straightforward. For each `url` received, we use `aiohttp` to download the file and temporarily store it in a `temp` folder. Then we parse the file’s contents and try to convert them to text using Microsoft’s [MarkItDown](https://github.com/microsoft/markitdown) library, which supports converting common formats such as DOCX, PPTX, XLS, XLSX, and PDF into Markdown text. Finally, we return the converted text to the LLM as the response.
 
 Below are explanations for each file and key parts of the code:
 
@@ -54,7 +54,7 @@ For local debugging, use `uvicorn` to start the FastAPI app and run it on port 8
 uvicorn main:app --reload --port 8000
 ```
 
-You can then access your plugin server at `http://localhost:8000`. Send a request to `http://localhost:8000/read_file` to use the file-reading feature.
+You can then access your plugin server at `http://localhost:8000`. Send a request to `http://localhost:8000/read_url` to use the file-reading feature.
 
 If you need to provide the service externally, set `uvicorn`’s `host` parameter to `0.0.0.0` so it listens on all IP addresses:
 
@@ -103,10 +103,10 @@ As mentioned earlier, NextChat plugins communicate with the plugin server via HT
 
 ```bash
 # On an external machine
-curl -X POST https://chat.mydomain.com/api/proxy/read_file -H 'Content-Type: application/json' -H 'X-Base-URL: http://base.url' -d '{"data":"..."}'
+curl -X POST https://chat.mydomain.com/api/proxy/read_url -H 'Content-Type: application/json' -H 'X-Base-URL: http://base.url' -d '{"data":"..."}'
 
 # On the server where NextChat is deployed
-curl -X POST http://base.url/read_file -H 'Content-Type: application/json' -d '{"data":"..."}'
+curl -X POST http://base.url/read_url -H 'Content-Type: application/json' -d '{"data":"..."}'
 ```
 
 To allow NextChat to access the plugin server we just set up, we need to place them on the same Docker network. To do this, define a custom network in the Docker Compose file (for example, `nextchat-network`) and connect both services to this network. See the `docker-compose.yml` in this directory for the final configuration.
