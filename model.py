@@ -18,3 +18,4 @@ class BaseResponse(JSONResponse):
 
 class FilePayload(BaseModel):
     url: str = None
+    docintel: bool = False

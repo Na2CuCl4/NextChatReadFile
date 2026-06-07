@@ -16,6 +16,15 @@ This plugin supports reading files in DOCX, PPTX, XLS, XLSX, and PDF formats fro
 
 The request address here is a Docker container name, which is equivalent to an internal network address; we’ll explain this in detail later.
 
+### v1.2.0 Update
+
+- **Health check endpoint**: Added `GET /` health check endpoint, returning the service version and task counters (processing/completed/failed tasks).
+- **Azure Document Intelligence support**: Added optional `docintel` parameter to both `/read_file` and `/read_url` endpoints. When enabled, it uses Azure Document Intelligence for file conversion with improved accuracy.
+- **Improved error messages**: Error responses now include detailed error descriptions for easier debugging and troubleshooting.
+- **Build script**: Added `docker-build.sh` build script that reads project name and version from `.env` for one-click Docker image build and push.
+- **Dependency updates**: Upgraded `aiohttp`, `fastapi`, `markitdown`, `uvicorn` and other dependencies; added `azure-core` and `openai`.
+- **Code cleanup**: Removed obsolete `readfile.json` OpenAPI spec, hardcoded `VERSION` and `TEMP_DIR`, switched Dockerfile CMD to exec form for proper signal handling.
+
 ### v1.1.0 Update
 
 To make the plugin easier to use, I forked the original NextChat project and continue to develop and maintain it at [NextChat](https://github.com/Na2CuCl4/NextChat). The new project provides better support for file reading: it can read files directly (`/read_file`) without first downloading them from a URL (`/read_url`), so you no longer need to add a plugin. You only need to add one environment variable in Docker Compose to enable this feature—see the [`docker-compose.yml`](docker-compose.yml) in this directory for details.

@@ -16,6 +16,15 @@ NextChat 是支持插件的，详情可参考 [NextChat-Awesome-Plugins](https:/
 
 这里的请求地址是一个 Docker 容器名称，相当于内网地址，我们后面会详细介绍。
 
+### v1.2.0 更新
+
+- **健康检查端点**：新增 `GET /` 健康检查接口，返回服务版本号和任务计数器（处理中/已完成/失败任务数）。
+- **Azure 文档智能支持**：`/read_file` 和 `/read_url` 接口新增可选参数 `docintel`，启用后使用 Azure Document Intelligence 进行文件转换，可获得更高的转换准确度。
+- **错误信息改进**：错误响应中现在包含详细的错误描述，便于调试和排查问题。
+- **构建脚本**：新增 `docker-build.sh` 构建脚本，从 `.env` 读取项目名称和版本号，一键构建并推送 Docker 镜像。
+- **依赖更新**：全面升级了 `aiohttp`、`fastapi`、`markitdown`、`uvicorn` 等依赖，新增 `azure-core` 和 `openai`。
+- **代码整理**：移除了过时的 `readfile.json` OpenAPI 规范文件，`VERSION` 和 `TEMP_DIR` 改为硬编码，Dockerfile CMD 改用 exec 形式以正确处理信号。
+
 ### v1.1.0 更新
 
 为了更方便地使用插件，我 Fork 了原 NextChat 项目，并在此基础上继续开发和维护，新的仓库地址为 [NextChat](https://github.com/Na2CuCl4/NextChat)。新项目更好地支持了文件读取功能，可以直接读取文件（`/read_file`）而不必从 URL 中下载文件后再读取（`/read_url`），故不必再添加插件。现在只需要在 Docker Compose 中添加一个环境变量，即可启用该功能，详情请参考目录中的 [`docker-compose.yml`](docker-compose.yml)。
