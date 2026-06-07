@@ -8,6 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # 安装项目依赖
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 暴露端口 8000
